@@ -1,19 +1,41 @@
 import { useEffect, useState } from "react";
 
-/* 
-  the two parameters for this function are: 
-  - key: the key on localStorage where we are saving this data
-  - initialValue: the initial value of state
-*/
+function getLocalStorageData(key){
+  let stringifiedValue = localStorage.getItem(key)
+  try{
+    stringifiedValue = JSON.parse(stringifiedValue)
+  }catch{}
+
+  return stringifiedValue
+}
+
+function setLocalStorageData(key,value){
+  const stringifiedValue = JSON.stringify(value)
+  localStorage.setItem(key,stringifiedValue)
+}
 export function useLocalStorage(key, initialValue = null) {
 
- const [state, setState]= useState(localStorage.getItem(key) || initialValue)
+ const [state, setState]= useState(getLocalStorageData(key) || initialValue)
   useEffect(() => {
     //we want to update local storage when state is updated or key
-    localStorage.setItem(key,state)
+    setLocalStorageData(key,state)
   },[key, state]);  
+  useEffect(()=>{
+    function handleStorageUpdate(){
+      const value = getLocalStorageData(key)
+      setState(value)
+    }
+  
+    window.addEventListener("storage", handleStorageUpdate)
+  
+    return function cleanup(){
+      window.removeEventListener("storage", handleStorageUpdate);
+    };
+  },[key])
   return [state, setState]
 }
+
+
 
 function Form() {
   // ✅ after implementing the useLocalStorage hook, replace useState with useLocalStorage

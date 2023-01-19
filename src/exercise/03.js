@@ -10,8 +10,8 @@ export function useMouseCoordinates() {
   //creating an event handler function to run when the mousemove event fires
    function handler(event){
     setCoordinates({
-      clientX: 100,
-      clientY: 200,
+      clientX: event.clientX,
+      clientY: event.clientY,
     })
    }
    
